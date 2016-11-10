@@ -34,7 +34,7 @@ fprintf('Calculating FIMS for various starting parameter sets...\n')
 pb = parforprogressbar(nParamTrys);
 parfor i = 1:nParamTrys
     mi = update(p(:,i));
-    nnzeigs(i) = calculateMetric(mi, con, obj, fitopts, initopts);
+    nnzeigs(i) = calculateMetric(mi, con, obj_temp, fitopts, initopts);
     pb.printbar(i)
 end
 [nnzeigs_sort,isort] = sort(nnzeigs,1,'descend');
