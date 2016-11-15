@@ -4,6 +4,8 @@ function k = chooseInitialParametersByCurvature(m, con, obj, fitopts, initopts)
 %   .Metric
 %       'SumOfConditionNumbers'
 %       'EigenvalueThresholdCount'
+%       'ConditionNumberThresholdCount'
+%       'ObjectiveScaledEigenvalueThresholdCount'
 %       'SumOfObjectiveScaledEigenvalues'
 %       'Random'
 %   .Threshold
@@ -78,6 +80,14 @@ switch initopts.Metric
     case 'EigenvalueThresholdCount'
         eigvals = abs(eig(F));
         val = sum(eigvals > threshold);
+    case 'ConditionNumberThresholdCount'
+        eigvals = abs(eig(F));
+        condnos = eigvals./eigvals(1);
+        val = sum(condnos > threshold);
+    case 'ObjectiveScaledEigenvalueThresholdCount'
+        G = ObjectiveValue(m, con, obj, opts);
+        eigvals = abs(eig(F));
+        val = sum(eigvals./G > threshold);
     case 'SumOfObjectiveScaledEigenvalues'
         G = ObjectiveValue(m, con, obj, opts);
         val = trace(abs(F))./G;
