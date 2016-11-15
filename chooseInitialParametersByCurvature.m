@@ -83,14 +83,14 @@ threshold = initopts.Threshold;
 switch initopts.Metric
     case 'SumOfConditionNumbers'
         eigvals = abs(eig(F));
-        condnos = eigvals./eigvals(1);
+        condnos = eigvals./max(eigvals);
         val = sum(condnos);
     case 'EigenvalueThresholdCount'
         eigvals = abs(eig(F));
         val = sum(eigvals > threshold);
     case 'ConditionNumberThresholdCount'
         eigvals = abs(eig(F));
-        condnos = eigvals./eigvals(1);
+        condnos = eigvals./max(eigvals);
         val = sum(condnos > threshold);
     case 'ObjectiveScaledEigenvalueThresholdCount'
         G = ObjectiveValue(m, con, obj, opts);

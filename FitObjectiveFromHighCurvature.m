@@ -56,7 +56,7 @@ end
 m = m.Update(k0);
 
 varargout = cell(nargout,1);
-[varargout{:}] = fitfun(m, con, obj, opts);
+[varargout{1:min(nargout,4)}] = fitfun(m, con, obj, opts);
 if nargout > 4
     varargout{5} = F;
 end
