@@ -1,4 +1,4 @@
-function k = chooseInitialParametersByCurvature(m, con, obj, fitopts, initopts)
+function [k,Fs] = chooseInitialParametersByCurvature(m, con, obj, fitopts, initopts)
 % initopts
 %   .UseHessian
 %   .Metric
@@ -44,9 +44,17 @@ end
 fitopts.Verbose = 0;
 fprintf('Calculating FIMS for various starting parameter sets...\n')
 pb = parforprogressbar(nParamTrys);
+if nargout > 1
+    Fs = cell(nParamTrys,1);
+end
+nargsout = nargout;
 parfor i = 1:nParamTrys
     mi = update(p(:,i));
-    nnzeigs(i) = calculateMetric(mi, con, obj_temp, fitopts, initopts);
+    if nargsout > 1
+        [nnzeigs(i),Fs{i}] = calculateMetric(mi, con, obj_temp, fitopts, initopts);
+    else
+        nnzeigs(i) = calculateMetric(mi, con, obj_temp, fitopts, initopts);
+    end
     pb.printbar(i)
 end
 [nnzeigs_sort,isort] = sort(nnzeigs,1,'descend');
@@ -62,7 +70,7 @@ p = 10.^(bsxfun(@times, log10(pLo)+(log10(pHi)-log10(pLo)), rand(nParams, nParam
 end
 
 
-function val = calculateMetric(m, con, obj, opts, initopts)
+function [val,F] = calculateMetric(m, con, obj, opts, initopts)
 
 if initopts.UseHessian
     F = ObjectiveHessian(m, con, obj, opts);
