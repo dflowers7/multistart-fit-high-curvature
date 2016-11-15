@@ -1,4 +1,7 @@
 function varargout = FitObjectiveFromHighCurvature(m, con, obj, opts, fitfun, useObj, useConstraints, initopts)
+% varargout = FitObjectiveFromHighCurvature(m, con, obj, opts, fitfun, useObj, useConstraints, initopts)
+% Returns same outputs as FitObjective, plus a fifth output returning the
+% FIM of the starting parameter set of the optimization
 
 if nargin < 8
     initopts = [];
@@ -44,11 +47,18 @@ end
 
 % Randomly select 100 parameter sets, then pick the one with a FIM with the most
 % nonzero eigenvalues
-k0 = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
+if nargout > 4
+    [k0,F] = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
+else
+    k0 = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
+end
 
 m = m.Update(k0);
 
 varargout = cell(nargout,1);
 [varargout{:}] = fitfun(m, con, obj, opts);
+if nargout > 4
+    varargout{5} = F;
+end
 
 end
