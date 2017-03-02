@@ -28,8 +28,12 @@ if isempty(initopts)
     initopts.Threshold = 1e-3;
 end
 
+% Fix FitObjective opts
+[m,con,obj,opts] = FixFitObjectiveOpts(m,con,obj,opts);
+
 hasConstraint = isfield(opts, 'ConstraintObj');
 
+% Default to appending all constraints' functions when calculating the FIM
 if hasConstraint && isempty(useConstraints)
     useConstraints = cell(size(opts.ConstraintObj));
     useConstraints(:) = {true(size(opts.ConstraintObj))};
