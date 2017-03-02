@@ -55,6 +55,19 @@ end
 
 m = m.Update(k0);
 
+% Feig = eig(F);
+% eigindex = sum(Feig > initopts.Threshold);
+% %eigindex = 63;
+% 
+% % Set up constraint function that prevents optimization from reducing the
+% % number of significant FIM eigenvalues
+% [intfun,objfun] = GenerateFIMEigenvalueFunction(eigindex, true);
+% opts.ConstraintObj = {obj};
+% opts.ConstraintVal = -log(initopts.Threshold);
+% opts.ConstraintIntegrateFunction = intfun;
+% opts.ConstraintReductionFunction = objfun;
+
+
 varargout = cell(nargout,1);
 [varargout{1:min(nargout,4)}] = fitfun(m, con, obj, opts);
 if nargout > 4

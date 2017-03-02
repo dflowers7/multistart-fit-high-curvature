@@ -1,4 +1,4 @@
-function [k,Fs] = chooseInitialParametersByCurvature(m, con, obj, fitopts, initopts)
+function [k,Fs,p] = chooseInitialParametersByCurvature(m, con, obj, fitopts, initopts)
 % initopts
 %   .UseHessian
 %   .Metric
@@ -15,16 +15,6 @@ nParamSets = 1; % This function is currently used to select one parameter set on
 nParams = m.nk;
 pLo = fitopts.LowerBound;
 pHi = fitopts.UpperBound;
-
-% Fix 0 or Inf bounds
-if any(pLo == 0)
-    warning('Zero-valued lower bounds detected. Assuming a 1e-6 lower bound for log-space sampling.')
-    pLo(pLo == 0) = 1e-6;
-end
-if any(isinf(pHi))
-    warning('Inf-valued upper bounds detected. Assuming a 1e6 upper bound for log-space sampling.')
-    pHi(isinf(pHi)) = 1e6;
-end
 
 nParamTrys = 100*nParamSets;
 p = randomlySampleParameters(nParams,nParamTrys,pLo,pHi);
@@ -60,12 +50,6 @@ end
 [nnzeigs_sort,isort] = sort(nnzeigs,1,'descend');
 fprintf('Best FIM has a rank score of %g\n', nnzeigs_sort(1))
 k = p(:,isort(1:nParamSets));
-
-end
-
-function p = randomlySampleParameters(nParams,nParamTrys,pLo,pHi)
-
-p = 10.^(bsxfun(@times, log10(pLo)+(log10(pHi)-log10(pLo)), rand(nParams, nParamTrys)));
 
 end
 
