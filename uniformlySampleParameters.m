@@ -25,6 +25,6 @@ end
 deltap = bsxfun(@times, pHi-pLo, rand(nParams, nParamTrys));
 
 p = bsxfun(@plus, pLo, deltap);
-p(uselogsampling) = exp(p(uselogsampling));
+p(uselogsampling,:) = exp(p(uselogsampling,:));
 
 end

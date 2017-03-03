@@ -30,6 +30,7 @@ end
 
 % Fix FitObjective opts
 [m,con,obj,opts] = FixFitObjectiveOpts(m,con,obj,opts);
+opts.Verbose = opts.Verbose + 1; % Hack to keep Verbose from being decreased twice. Forces Verbose to be on.
 
 hasConstraint = isfield(opts, 'ConstraintObj');
 
@@ -52,12 +53,15 @@ end
 % Randomly select 100 parameter sets, then pick the one with a FIM with the most
 % nonzero eigenvalues
 if nargout > 4
-    [k0,F] = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
+    [k0,s0,q0,h0,F] = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
 else
-    k0 = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
+    [k0,s0,q0,h0] = chooseInitialParametersByCurvature(m, con, obj_0, opts_0, initopts);
 end
 
 m = m.Update(k0);
+for i = 1:numel(con)
+    con(i) = con(i).Update(s0{i},q0{i},h0{i});
+end
 
 % Feig = eig(F);
 % eigindex = sum(Feig > initopts.Threshold);
