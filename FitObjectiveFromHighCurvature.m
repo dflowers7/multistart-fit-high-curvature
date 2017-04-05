@@ -30,7 +30,7 @@ end
 
 % Fix FitObjective opts
 [m,con,obj,opts] = FixFitObjectiveOpts(m,con,obj,opts);
-opts.Verbose = opts.Verbose + 1; % Hack to keep Verbose from being decreased twice. Forces Verbose to be on.
+opts.Verbose = opts.Verbose + 1; % Hack to keep Verbose from being decreased twice. Forces Verbose to be on, though.
 
 hasConstraint = isfield(opts, 'ConstraintObj');
 

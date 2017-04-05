@@ -1,5 +1,9 @@
 function p = uniformlySampleParameters(nParams,nParamTrys,pLo,pHi,uselogsampling)
 
+if isscalar(uselogsampling)
+    uselogsampling = repmat(uselogsampling, nParams, 1);
+end
+
 % Take log of parameters
 pLo(uselogsampling) = log(pLo(uselogsampling));
 pHi(uselogsampling) = log(pHi(uselogsampling));

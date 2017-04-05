@@ -16,6 +16,8 @@ function [k,s,q,h,Fs,p_k,p_s,p_q,p_h] = chooseInitialParametersByCurvature(m, co
 %   one can indicate for each individual fit parameter whether it should be
 %   sampled uniformly on a log (true) or linear (false) basis.
 
+%error('This function is old and needs to be fixed!')
+
 if nargin < 6
     uselogsampling = true;
 end
