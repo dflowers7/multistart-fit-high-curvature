@@ -1,4 +1,4 @@
-function [ranks,ms,cons,Gs,Fs] = FindHighRankFIMs(cluster, nFIMsamples, napproxsamples, classifier, njobs, rankmetric, rankthreshold, modelgenfun, mfile, submitOpts, maxWait, uselogsampling, useObj, useConstraints, varargin)
+function [ranks,ms,cons,Gs,Fs,mdl] = FindHighRankFIMs(cluster, nFIMsamples, napproxsamples, classifier, njobs, rankmetric, rankthreshold, modelgenfun, mfile, submitOpts, maxWait, uselogsampling, useObj, useConstraints, varargin)
 
 input = [{cluster, nFIMsamples, napproxsamples, classifier, njobs, rankmetric, rankthreshold, modelgenfun, mfile, submitOpts, maxWait, uselogsampling, useObj, useConstraints} varargin(:)'];
 save input1.mat input
@@ -42,7 +42,8 @@ nstagnatedruns = 0;
 
 while rankisimproving
     
-    [Fs_temp,Gs_temp,~,~,Ts_nextround] = CalculateFIMs(cluster, modelgenfun, mfile, njobs, Ts_nextround, submitOpts, maxWait, useObj, useConstraints, varargin{:});
+    [Fs_temp,Gs_temp,~,~,Ts_nextround,direc] = CalculateFIMs(cluster, modelgenfun, mfile, njobs, Ts_nextround, submitOpts, maxWait, useObj, useConstraints, varargin{:});
+    submitOpts.dir = direc; % After the first round of FIM calculations, the same compilation and directory is used for each job
     Fs = cat(3, Fs, Fs_temp);
     Gs = vertcat(Gs, Gs_temp);
     Ts = [Ts Ts_nextround];
@@ -197,7 +198,7 @@ while rankisimproving
 
                     % If we don't have enough high-rank samples yet,
                     % randomly pair high-rank parameter sets with other
-                    % parameter sets and sample for more points along the
+                    % high-rank parameter sets and sample for more points along the
                     % lines connecting them
                     linelogTs = [logTs logTs_test];
                     ishighrank_line = [ranks>=rank_thresh; ishighrank_predicted_test];
@@ -232,7 +233,12 @@ while rankisimproving
                             i1_high = i2_high+1;
                             i2_high = min(i1_high+sum(ishighrank_line_new)-1, nHighRankPointsToKeep);
                             nlinepointstokeep = i2_high-i1_high+1;
-                            Ts_nextround_highranks(:,i1_high:i2_high) = 10.^linelogTs_new(:,find(ishighrank_line_new, nlinepointstokeep));
+                            if nlinepointstokeep > 0
+                                % Only store parameters if there are any to
+                                % store. Avoids errors in find() when
+                                % requesting 0 points.
+                                Ts_nextround_highranks(:,i1_high:i2_high) = 10.^linelogTs_new(:,find(ishighrank_line_new, nlinepointstokeep));
+                            end
                             
                             haveenoughhighranksamples = i2_high >= nHighRankPointsToKeep;
                             
@@ -286,7 +292,12 @@ while rankisimproving
                             i1_close = i2_close+1;
                             i2_close = min(i1_close+numel(close_i_new)-1, nClosePointsToKeep);
                             nlinepointstokeep = i2_close-i1_close+1;
-                            Ts_nextround_close(:,i1_close:i2_close) = 10.^linelogTs_new(:,close_i_new(1:nlinepointstokeep));
+                            if nlinepointstokeep > 0
+                                % Only store parameters if there are any to
+                                % store. Avoids errors in find() when
+                                % requesting 0 points.
+                                Ts_nextround_close(:,i1_close:i2_close) = 10.^linelogTs_new(:,close_i_new(1:nlinepointstokeep));
+                            end
                             
                             haveenoughclosesamples = i2_close >= nClosePointsToKeep;
                             

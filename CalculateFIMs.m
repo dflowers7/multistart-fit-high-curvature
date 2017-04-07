@@ -1,4 +1,4 @@
-function [Fs,Gs,ms,cons,Ts] = CalculateFIMs(cluster, modelgenfun, mfile, njobs, Ts, submitOpts, maxWait, useObj, useConstraints, varargin)
+function [Fs,Gs,ms,cons,Ts,direc] = CalculateFIMs(cluster, modelgenfun, mfile, njobs, Ts, submitOpts, maxWait, useObj, useConstraints, varargin)
 
 % Determine which parameter sets will be calculated by which jobs
 np = size(Ts,2);
@@ -29,7 +29,7 @@ end
 submitOpts.additionalFun = [submitOpts.additionalFun(:); {mfile;'CalculateFIMs_job';func2str(modelgenfun)}];
 
 nout = 5;
-results = submitClusterSync(cluster, @InitializeParallel, inputs, nout, submitOpts, 60, maxWait);
+[results,direc] = submitClusterSync(cluster, @InitializeParallel, inputs, nout, submitOpts, 60, maxWait);
 [ranks,ms,cons,Gs,Fs] = deal(cell(njobs,1));
 jobiscomplete = ~cellfun(@isempty, results);
 jobcomplete_i = find(jobiscomplete);
